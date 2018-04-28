@@ -8,5 +8,4 @@ db = couch['tweets']
 for id in db:
     doc = db[id] # to get the document by id
     text = doc['text'] # to get the text field in one tweet document
-    print(text)
     break
