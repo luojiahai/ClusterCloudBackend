@@ -24,7 +24,7 @@ from mpi4py import MPI
 # Import csv to read files and arguments
 import csv, sys, getopt
 # Import regular expressions to look for topics and mentions, json to parse tweet data
-import re, json, operator
+import re, json, operator, couchdb
 
 # Constants
 MASTER_RANK = 0
@@ -85,6 +85,7 @@ def main(argv):
   # Work out our rank, and run either master or slave process
   comm = MPI.COMM_WORLD
   rank = comm.Get_rank()
+  input_file = couchdb.Server('http://115.146.84.252:5432/')['tweets']
   if rank == 0 :
     # We are master
     master_work_processor(comm, input_file)
