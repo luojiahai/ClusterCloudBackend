@@ -37,10 +37,15 @@ def do_work(rank, input_file, size):
 
 def marshall_work(comm):
     processes = comm.Get_size()
+    #TODO: change it to your desired result type
     results = []
+    
     for i in range(processes-1):
     # Receive data
-        counts.append(comm.recv(source=(i+1), tag=MASTER_RANK))
+        results.append(comm.recv(source=(i+1), tag=MASTER_RANK))
+
+    #TODO: manipulate with the list of results received from all processors
+    #      and print out the result
     return results
 
 
