@@ -32,7 +32,7 @@ MASTER_RANK = 0
 
 ''' Fill in this function with the operation you want to do
     and return partial output'''
-def do_work(rank, input_file, size):
+def do_work(rank, db, size):
     return None
 
 def marshall_work(comm):
@@ -50,52 +50,48 @@ def marshall_work(comm):
 
 
 '''the result may be changed to required type before printing to terminal'''
-def master_work_processor(comm, input_file):
+def master_work_processor(comm, db):
     # Read our tweets
     rank = comm.Get_rank()
     size = comm.Get_size()
 
-    results = do_work(rank, input_file,
-                                size)
+    results = do_work(rank, db, size)
     if size > 1:
-      counts = marshall_work(comm)
-      # Marshall that data
-      for c in counts:
-        for i in range(16):
-          results[i] += c[i]
+        counts = marshall_work(comm)
+        # Marshall that data
+        for c in counts:
+            for i in range(16):
+                results[i] += c[i]
     #print result
     print(results)
     
     return None
 
 
-def slave_work_processor(comm,input_file):
-  # We want to process all relevant tweets and send our counts back
-  # to master
-  rank = comm.Get_rank()
-  size = comm.Get_size()
+def slave_work_processor(comm, db):
+    # We want to process all relevant tweets and send our counts back
+    # to master
+    rank = comm.Get_rank()
+    size = comm.Get_size()
 
-  counts = do_work(rank, input_file, size)
-  comm.send(counts, dest=MASTER_RANK, tag=MASTER_RANK)
+    counts = do_work(rank, db, size)
+    comm.send(counts, dest=MASTER_RANK, tag=MASTER_RANK)
         
-def main(argv):
-  # Get
-  input_file = read_arguments(argv)[0]
-  print(input_file)
-  # Work out our rank, and run either master or slave process
-  comm = MPI.COMM_WORLD
-  rank = comm.Get_rank()
-  input_file = couchdb.Server('http://115.146.84.252:5432/')['tweets']
-  if rank == 0 :
-    # We are master
-    master_work_processor(comm, input_file)
-    print('in master')
-  else:
-    # We are slave
-    print('in slave')
-    slave_work_processor(comm, input_file)
+def main():
+    # Work out our rank, and run either master or slave process
+    comm = MPI.COMM_WORLD
+    rank = comm.Get_rank()
+    db = couchdb.Server('http://115.146.84.252:5432/')['tweets']
+    if rank == 0 :
+        # We are master
+        master_work_processor(comm, db)
+        print('in master')
+    else:
+        # We are slave
+        slave_work_processor(comm, db)
+        print('in slave')
 
 # Run the actual program
 if __name__ == "__main__":
-  main(sys.argv[1:])
+    main()
                       
