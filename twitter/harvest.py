@@ -22,7 +22,9 @@ class MyListener(StreamListener):
     def on_data(self, data):
         try:
             obj = json.loads(data)
-            db.save(obj)
+            if (obj['coordinates']):
+                db.save(obj)
+                print("GET")
             return True
         except BaseException as e:
             print("Error on_data: %s" % str(e))
@@ -33,4 +35,4 @@ class MyListener(StreamListener):
         return True
 
 twitter_melbourne_stream = Stream(auth, MyListener())
-twitter_melbourne_stream.filter(track=['#australia', '#melbourne', '#sydney', '#adelaide', '#brisbane', 'perth', 'darwin', 'canberra', 'hobart'])
+twitter_melbourne_stream.filter(locations=[113.6594,-43.00311,153.61194,-12.46113])
