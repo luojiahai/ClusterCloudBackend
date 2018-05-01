@@ -24,7 +24,6 @@ class MyListener(StreamListener):
             obj = json.loads(data)
             if (obj['coordinates']):
                 db.save(obj)
-                print("GET")
             return True
         except BaseException as e:
             print("Error on_data: %s" % str(e))
