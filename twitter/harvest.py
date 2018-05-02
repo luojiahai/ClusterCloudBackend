@@ -6,7 +6,7 @@ import json
 import couchdb
 
 couch = couchdb.Server()
-db = couch['tweets']
+db = couch['tweets_']
 
 consumer_key = 'JLffJb3c9glRUc5E5OxiNZ1ry'
 consumer_secret = 'l8BiZHvqTxJ6CP2PDYDnQz6jc8ioBo82Zw49HDhFMkYyW9WJIz'
@@ -23,7 +23,10 @@ class MyListener(StreamListener):
         try:
             obj = json.loads(data)
             if (obj['coordinates']):
-                db.save(obj)
+                try:
+                    db[obj['id_str']] = obj
+                except Exception as e:
+                    None
             return True
         except BaseException as e:
             print("Error on_data: %s" % str(e))
