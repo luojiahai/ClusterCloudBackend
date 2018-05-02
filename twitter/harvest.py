@@ -5,7 +5,7 @@ from tweepy.streaming import StreamListener
 import json
 import couchdb
 
-couch = couchdb.Server()
+couch = couchdb.Server('http://localhost:5432/')
 db = couch['tweets_']
 
 consumer_key = 'JLffJb3c9glRUc5E5OxiNZ1ry'

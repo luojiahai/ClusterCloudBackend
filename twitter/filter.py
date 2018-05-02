@@ -1,6 +1,6 @@
 import couchdb
 
-couch = couchdb.Server()
+couch = couchdb.Server('http://localhost:5432/')
 db = couch['tweets']
 
 for id in db:
