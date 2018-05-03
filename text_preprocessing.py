@@ -46,5 +46,19 @@ def get_tweets_in_range(ux,uy,bx,by, data_set):
         except:
             continue
     return data
-            
+
+def get_sentiment_data(data_set):
+    '''gather information about sentiment of tweets and return a dictionary
+       of the stats'''
+    data = []
+    for doc in data_set:
+        data.append(sentiment_analyze(doc))
+    avg_polarity = 0
+    avg_subjectivity = 0
+    num_docs = len(data_set)
+
+    stats = {'avg_polarity':avg_polarity,
+             'avg_subjectivity':avg_subjectivity,
+             'num_docs': num_docs}
+    return stats
         
