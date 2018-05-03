@@ -1,7 +1,9 @@
+import requests
+
 class Scheduler:
     def __init__(self):
-        self.workers = []
-        self.pool = []
+        self.workers = []   # worker {"ip": HOST_NAME, "port": PORT_NUMBER, "working": IS_WORKING}
+        self.pool = []      # pool
 
     def get_workers(self):
         return self.workers
@@ -22,12 +24,21 @@ class Scheduler:
                 return True
         return False
 
+    def do_work(self, worker, tasks):
+        data = {'tasks': tasks}
+        requests.post('http://' + worker['ip'] + ':' + worker['port'] + '/api/work', json=data)
+
+
     def run_schedule(self, tasks):
         # do something with the tasks, please multi-threaded and organise pool
         ### ### ###
-        string = "["
+
+        # print tasks for testing
         for task in tasks:
-            string += task + ", "
-        string += "]"
-        print("SCHEDULE RUN: " + string)
-        None
+            print(task)
+            
+        # request to work
+        ### ### ### this is a simple one, should divide tasks to workers and do multi-thread
+        for worker in self.workers:
+            self.do_work(worker, tasks)
+

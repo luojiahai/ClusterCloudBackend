@@ -16,13 +16,16 @@ class Worker:
     def run_work(self, tasks):
         for task in tasks:
             try:
+                # get neccessary data
                 tweet = self.tweets_db[task]        # get the tweet by id
                 text = tweet['text']                # get the text
                 score = self.analyse(text)          # get the sentiment score here
                 id_str = tweet['_id']               # get the id
                 coordinates = tweet['coordinates']  # get the coordinates
 
-                # save to sa_tweets_db
+                print("analysed: " + text)
+
+                # save data to sa_tweets_db
                 self.sa_tweets_db[id_str] = {
                                     'text': text, 
                                     'score': score, 

@@ -75,7 +75,7 @@ class Fetcher:
 
             data = {'tasks': self.tweets}
             try:
-                # request schedule
+                # request to schedule
                 r = requests.post(self.master + "/api/schedule", json=data)
                 print(r)
                 self.tweets.clear()
