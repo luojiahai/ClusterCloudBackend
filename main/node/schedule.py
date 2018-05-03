@@ -25,5 +25,3 @@ class Scheduler:
     def run(self, tasks):
         # do something with the tasks, please multi-threaded
         None
-
-scheduler = Scheduler('http://127.0.0.1', '5000')

@@ -6,6 +6,9 @@ import requests
 
 app = Flask(__name__)
 
+scheduler = Scheduler('http://127.0.0.1', '5000')
+worker = Worker()
+
 @app.route('/')
 def index():
     return 'HELLO, WORLD!'
@@ -18,6 +21,7 @@ def connect():
             return "WORKER EXISTED"
         else:
             scheduler.add_worker(data)
+            # do something here, to store connection
             return "CONNECT SUCCESS"
     return json.dumps(scheduler.get_workers())
 

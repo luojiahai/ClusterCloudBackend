@@ -31,5 +31,3 @@ class Worker:
             except KeyError as e:
                 print(e)
                 continue
-    
-worker = Worker()
