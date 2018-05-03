@@ -7,8 +7,13 @@ import couchdb
 import time
 import threading
 import requests
+from flask import Flask, session, redirect, url_for, escape, request
+import json
 
-master = 'http://127.0.0.1' + ':' + '5000'
+app = Flask(__name__)
+
+default_master = 'http://127.0.0.1' + ':' + '3000'
+connections = []
 
 couch = couchdb.Server()
 db = couch['tweets_']
@@ -47,13 +52,6 @@ class MyListener(StreamListener):
 
 twitter_melbourne_stream = Stream(auth, MyListener())
 
-def test_connection():
-    try:
-        content = requests.get(master + '/api/connect').content
-        return True
-    except Exception as e:
-        return False
-
 def listen():
     twitter_melbourne_stream.filter(locations=[113.6594,-43.00311,153.61194,-12.46113])
 
@@ -63,10 +61,27 @@ def work():
         print(tweets)
         tweets.clear()
 
+def test_connection():
+    while True:
+        time.sleep(60)
+        try:
+            content = requests.get(default_master + '/api/connect').content
+            return True
+        except Exception as e:
+            # do something here
+            print("DOWN!")
+            return False
+
 threads = []
-listen = threading.Thread(target=listen)
-threads.append(listen)
-listen.start()
-work = threading.Thread(target=work)
-threads.append(work)
-work.start()
+
+t1 = threading.Thread(target=listen)
+threads.append(t1)
+t1.start()
+
+t2 = threading.Thread(target=work)
+threads.append(t2)
+t2.start()
+
+t3 = threading.Thread(target=test_connection)
+threads.append(t3)
+t3.start()
