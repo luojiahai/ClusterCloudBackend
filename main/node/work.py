@@ -12,7 +12,7 @@ class Worker:
         # do sentiment analysis here
         return 0.5
 
-    def run(self, tasks):
+    def run_work(self, tasks):
         for task in tasks:
             try:
                 tweet = self.tweets_db[task]        # get the tweet by id

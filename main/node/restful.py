@@ -1,3 +1,5 @@
+import sys
+import getopt
 from flask import Flask, session, redirect, url_for, escape, request
 from schedule import *
 from work import *
@@ -7,9 +9,11 @@ import requests
 
 app = Flask(__name__)
 
+master = "http://127.0.0.1:5000"
+
 scheduler = Scheduler()
 worker = Worker()
-fetcher = Fetcher("http://127.0.0.1:5000/")
+fetcher = Fetcher(master)
 
 @app.route('/')
 def index():
@@ -20,20 +24,21 @@ def connect():
     if request.method == 'POST':
         data = request.json
         if (scheduler.has_worker(data['ip'])):
-            return "WORKER EXISTED"
+            return "ROUTE /api/connect POST: WORKER EXISTED"
         else:
             scheduler.add_worker(data)
             # do something here, to store connection
-            return "CONNECT SUCCESS"
+            return "ROUTE /api/connect POST: CONNECT SUCCESS"
     return json.dumps(scheduler.get_workers())
 
 @app.route('/api/schedule', methods=['GET', 'POST'])
 def schedule():
     if request.method == 'POST':
         data = request.json['tasks']
-        scheduler.run(data)
-        return "SCHEDULE DONE"
+        scheduler.run_schedule(data)
+        return "ROUTE /api/schedule POST: SCHEDULE DONE"
     return '''
+        ROUTE /api/schedule GET: 
         {
             "tasks" : [{TWEET_ID}]
         }
@@ -43,11 +48,29 @@ def schedule():
 def work():
     if request.method == 'POST':
         data = request.json['tasks']
-        worker.run(data)
-        return "WORK DONE"
+        worker.run_work(data)
+        return "ROUTE /api/work POST: WORK DONE"
     return '''
+        ROUTE /api/work GET: 
         {
             "tasks" : [{TWEET_ID}]
+        }
+    '''
+
+@app.route('/api/broadcast', methods=['GET', 'POST'])
+def broadcast():
+    if request.method == 'POST':
+        workers = request.json['workers']
+        for worker in workers:
+            if (not scheduler.has_worker(worker['ip'])):
+                scheduler.add_worker(worker)
+            else:
+                print("ROUTE /api/broadcast POST: WORKER EXIST " + worker['ip'] + ":" + worker['port'])
+        return "ROUTE /api/broadcast POST: BROADCAST DONE"
+    return '''
+        ROUTE /api/broadcast GET: 
+        {
+            "workers" : [{WORKER}]
         }
     '''
 
@@ -56,22 +79,41 @@ def change_master():
     # do something here to change a different master master
     None
 
+def make_connection(argv):
+    host = ''
+    port = ''
+    try:
+        opts, args = getopt.getopt(argv, "h:p:", ["host=","port="])
+    except getopt.GetoptError:
+        print('usage: restful.py -h {HOST_NAME} -p {PORT_NUMBER}')
+        sys.exit(2)
+    if (len(opts) != 2):
+        print('usage: restful.py -h {HOST_NAME} -p {PORT_NUMBER}')
+        sys.exit(2)
+    for opt, arg in opts:
+        if opt in ("-h", "--host"):
+            host = arg
+        elif opt in ("-p", "--port"):
+            port = arg
+    
+    # myself is a worker
+    worker = {'ip': host, 'port': port}
+    scheduler.add_worker(worker)
 
-def run_api():
-    app.run(threaded=True, debug=True)
+    # if me not the master
+    if (host not in master):
+        # do connect to master
+        r = requests.post(master + "/api/connect", data = {'ip': host, 'port':port})
+        print(r)
+        None
 
 if __name__ == '__main__':
-    threads = []
+    make_connection(sys.argv[1:])
 
     t1 = threading.Thread(target=fetcher.listen)
-    threads.append(t1)
     t1.start()
 
-    t2 = threading.Thread(target=fetcher.work)
-    threads.append(t2)
+    t2 = threading.Thread(target=fetcher.request_work)
     t2.start()
 
-    t3 = threading.Thread(target=run_api)
-    threads.append(t3)
-    t3.start
-    
+    app.run(threaded=True, debug=False)

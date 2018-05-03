@@ -44,16 +44,19 @@ class Fetcher:
             return True
             
         def on_error(self, status):
-            print("ON_ERROR: " + status)
+            print("ON_ERROR: " + str(status))
             return True
-    
+
     def listen(self):
         twitter_melbourne_stream = Stream(self.auth, self.MyListener())
         twitter_melbourne_stream.filter(locations=[113.6594,-43.00311,153.61194,-12.46113])
 
-    def work(self):
+    def request_work(self):
         while True:
             time.sleep(30)
             print(self.tweets)
             # should be do something here, send these tweets to scheduler
+            data = {'tasks': self.tweets}
+            r = requests.post(self.master + "/api/schedule", json=data)
+            print(r)
             self.tweets.clear()
