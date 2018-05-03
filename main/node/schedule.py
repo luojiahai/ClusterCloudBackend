@@ -1,6 +1,5 @@
 class Scheduler:
-    def __init__(self, master_ip, master_port):
-        self.master = master_ip + ':' + master_port
+    def __init__(self):
         self.workers = {}
         self.pool = {}
 
@@ -16,12 +15,6 @@ class Scheduler:
     def has_worker(self, ip):
         return ip in self.workers
 
-    # def add_task(self, task):
-    #     self.pool.append(task)
-
-    def change_master(self, master_ip, master_port):
-        self.master = master_ip + ':' + master_port
-
     def run(self, tasks):
-        # do something with the tasks, please multi-threaded
+        # do something with the tasks, please multi-threaded and organise pool
         None

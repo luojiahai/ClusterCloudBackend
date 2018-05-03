@@ -1,10 +1,11 @@
 import couchdb
 
 class Worker:
+    couch = couchdb.Server()
+    tweets_db = couch['tweets_']
+    sa_tweets_db = couch['sentiment-analysis-tweets_']
+
     def __init__(self):
-        couch = couchdb.Server()
-        self.tweets_db = couch['tweets_']
-        self.sa_tweets_db = couch['sentiment-analysis-tweets_']
         None
     
     def analyse(self, text):
@@ -29,5 +30,5 @@ class Worker:
                                     'coordinates': coordinates
                                 } # maybe more to save
             except KeyError as e:
-                print(e)
+                print("CONFLICT")
                 continue
