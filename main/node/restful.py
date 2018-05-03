@@ -59,17 +59,19 @@ def work():
 @app.route('/api/broadcast', methods=['GET', 'POST'])
 def broadcast():
     if request.method == 'POST':
-        workers = request.json['workers']
-        for worker in workers:
-            if (not scheduler.has_worker(worker['ip'])):
-                scheduler.add_worker(worker)
+        connections = request.json['connections']
+        for con in connections:
+            if (not scheduler.has_worker(con['ip'])):
+                scheduler.add_worker(con)
+            if (not fetcher.has_connection(con['ip'])):
+                fetcher.add_connection(con)
             else:
-                print("ROUTE /api/broadcast POST: WORKER EXIST " + worker['ip'] + ":" + worker['port'])
+                print("ROUTE /api/broadcast POST: CON EXIST " + con['ip'] + ":" + con['port'])
         return "ROUTE /api/broadcast POST: BROADCAST DONE"
     return '''
         ROUTE /api/broadcast GET: 
         {
-            "workers" : [{WORKER}]
+            "connections" : [{WORKER}]
         }
     '''
 
@@ -90,16 +92,17 @@ def initialize(argv):
         elif opt in ("-p", "--port"):
             port = arg
     
-    # myself is a worker
+    # add myself to workers and connections
     worker = {'ip': host, 'port': port}
     scheduler.add_worker(worker)
+    fetcher.add_connection(worker)
 
-    # if me not the master
-    if (host not in master):
-        # do connect to master
-        r = requests.post(master + "/api/connect", data = {'ip': host, 'port':port})
-        print(r)
-        None
+    # broadcast
+    for con in fetcher.get_connections():
+        if (host not in con['ip']):
+            # if not myself
+            requests.post(master + "/api/broadcast", data = {'ip': con['ip'], 'port': con['port']})
+
 
 if __name__ == '__main__':
     initialize(sys.argv[1:])

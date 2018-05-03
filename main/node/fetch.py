@@ -28,8 +28,17 @@ class Fetcher:
         self.connections = []
     
     def add_connection(self, con):
-        self.connections.append(con)
+        self.connections.append({'ip': con['ip'], 'port': con['port']})
         # {"ip": HOST_NAME, "port": PORT_NUMBER}
+
+    def get_connections(self):
+        return self.connections
+
+    def has_connection(self, con):
+        for connection in self.connections:
+            if (connection['ip'] == ip):
+                return True
+        return False
 
     def change_master(self):
         # choose a new master
