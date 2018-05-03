@@ -31,6 +31,11 @@ class Fetcher:
         self.connections.append(con)
         # {"ip": HOST_NAME, "port": PORT_NUMBER}
 
+    def change_master(self):
+        # choose a new master
+        con = {'ip': 'hostname', 'port': 'port'}
+        self.master = 'http://' + con['ip'] + ':' + con['port']
+
     class MyListener(StreamListener):
         def on_data(self, data):
             try:
@@ -61,6 +66,13 @@ class Fetcher:
             print(self.tweets)
             # should be do something here, send these tweets to scheduler
             data = {'tasks': self.tweets}
-            r = requests.post(self.master + "/api/schedule", json=data)
-            print(r)
-            self.tweets.clear()
+            try:
+                # request schedule
+                r = requests.post(self.master + "/api/schedule", json=data)
+                print(r)
+                self.tweets.clear()
+            except Exception as e:
+                # if no response, then no connection
+                self.change_master()
+                None
+            

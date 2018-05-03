@@ -30,5 +30,4 @@ class Worker:
                                     'coordinates': coordinates
                                 } # maybe more to save
             except KeyError as e:
-                print("CONFLICT")
                 continue
