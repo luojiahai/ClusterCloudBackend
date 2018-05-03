@@ -46,7 +46,7 @@ class Fetcher:
                         Fetcher.db[id_str] = obj
                         Fetcher.tweets.append(id_str)
                     except Exception as e:
-                        print("LISTENER EXCEPTION")
+                        print("EXCEPTION: LISTENER")
                 return True
             except BaseException as e:
                 print("Error on_data: %s" % str(e))
@@ -63,8 +63,7 @@ class Fetcher:
     def request_work(self):
         while True:
             time.sleep(30)
-            print(self.tweets)
-            # should be do something here, send these tweets to scheduler
+
             data = {'tasks': self.tweets}
             try:
                 # request schedule

@@ -10,6 +10,7 @@ class Worker:
     
     def analyse(self, text):
         # do sentiment analysis here
+        ### ### ###
         return 0.5
 
     def run_work(self, tasks):
@@ -20,8 +21,6 @@ class Worker:
                 score = self.analyse(text)          # get the sentiment score here
                 id_str = tweet['_id']               # get the id
                 coordinates = tweet['coordinates']  # get the coordinates
-
-                print(text)
 
                 # save to sa_tweets_db
                 self.sa_tweets_db[id_str] = {
