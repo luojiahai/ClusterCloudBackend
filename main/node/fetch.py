@@ -27,6 +27,10 @@ class Fetcher:
         self.master = default_master
         self.connections = []
     
+    def add_connection(self, con):
+        self.connections.append(con)
+        # {"ip": HOST_NAME, "port": PORT_NUMBER}
+
     class MyListener(StreamListener):
         def on_data(self, data):
             try:

@@ -27,7 +27,6 @@ def connect():
             return "ROUTE /api/connect POST: WORKER EXISTED"
         else:
             scheduler.add_worker(data)
-            # do something here, to store connection
             return "ROUTE /api/connect POST: CONNECT SUCCESS"
     return json.dumps(scheduler.get_workers())
 
@@ -74,12 +73,7 @@ def broadcast():
         }
     '''
 
-@app.route('/change_master')
-def change_master():
-    # do something here to change a different master master
-    None
-
-def make_connection(argv):
+def initialize(argv):
     host = ''
     port = ''
     try:
@@ -108,7 +102,7 @@ def make_connection(argv):
         None
 
 if __name__ == '__main__':
-    make_connection(sys.argv[1:])
+    initialize(sys.argv[1:])
 
     t1 = threading.Thread(target=fetcher.listen)
     t1.start()

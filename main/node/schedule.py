@@ -8,7 +8,8 @@ class Scheduler:
 
     def add_worker(self, worker):
         self.workers.append({'ip': worker['ip'], 'port': worker['port'], 'working': False})
-
+        # {"ip": HOST_NAME, "port": PORT_NUMBER, "working": IS_WORKING}
+        
     def delete_worker(self, ip):
         for worker in self.workers:
             if (worker['ip'] == ip):
