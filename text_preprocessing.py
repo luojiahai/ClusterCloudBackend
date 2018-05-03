@@ -1,110 +1,50 @@
-#Import mpi so we can run on more than one node and processor
-from mpi4py import MPI
-# Import csv to read files and arguments
-import csv, sys, getopt
 # Import regular expressions to look for topics and mentions, json to parse tweet data
-import re, json, operator, couchdb
+import re, json, operator
 from collections import defaultdict as dd
+import textBlob
 
-# Constants
-MASTER_RANK = 0
-
-
-
-def preprocess(text):
+    
+def extract_hashtags(text):
+    '''take a raw tweet and return a list of hashtags'''
     hashtags = []
     hashtag = re.findall("(?:^|\s)#[a-z]{8,}(?=$|\s)",text)
-    
-    text = re.sub("(?:^|\s)#[a-z]{8,}(?=$|\s)","",text).strip()
     if hashtag:
         for h in hashtag:
             hashtags.append(h)
-    return (hashtags, text)
-
-''' preprocess the text and store in sadb, and return a dict of hashtags with frequency'''
-def do_work(rank, db, size, sadb):
-    i = 0
-    hashtags = dd(int)
-    tags = []
-    for data_id in db:
-        if i%size == rank:
-            try:
-                hashtags = dd(int)
-                doc = db[data_id]
-                text = doc['text']
-                coor = doc['coordinates']
-                tags, text = preprocess(text)
-                processed_data = ({'text': text, 'coordinates':coor})
-                sadb[str(doc['id'])] = processed_data
-                for tag in tags:
-                    hashtags[tag] += 1
-            except:
-                continue
-            
-        i += 1
-            
     return hashtags
 
-def marshall_work(comm):
-    processes = comm.Get_size()
-    #TODO: change it to your desired result type
-    results = []
-    
-    for i in range(processes-1):
-    # Receive data
-        results.append(comm.recv(source=(i+1), tag=MASTER_RANK))
+def sentiment_analyze(text):
+    '''take a tweet without hashtags and return sentiment values'''
+    testimonial1 = TextBlob(text)
+    text = testimonial.correct()
+    testimonial2 = TextBlob(text)
+    polarity = testimonial2.sentiment.polarity
+    subjectivity = testimonial2.sentiment.subjectivity
+    return (polarity, subjectivity)
 
-    #TODO: manipulate with the list of results received from all processors
-    #      and print out the result
-    return results
+def create_hashtag_dict(data_set):
+    '''take a list of tweets, extract hashtags, and create a dictionary
+       of hashtags where the values are tweet_id in couchdb'''
+    hashtag_dict = dd(list)
+    for doc in data_set:
+        text = doc['text']
+        doc_id = doc['id']
+        tags = extract_hashtags(text)
+        for tag in tags:
+            hashtag_dict[tag].append(doc_id)
+    return hashtag_dict
 
-
-'''the result may be changed to required type before printing to terminal'''
-def master_work_processor(comm, db, sadb):
-    # Read our tweets
-    rank = comm.Get_rank()
-    size = comm.Get_size()
-
-    results = do_work(rank, db, size, sadb)
-    if size > 1:
-        counts = marshall_work(comm)
-        # Marshall that data
-        for c in counts:
-            for i in range(16):
-                results[i] += c[i]
-    #print result
-    print(results)
-    
-    return None
-
-
-def slave_work_processor(comm, db,sadb):
-    # We want to process all relevant tweets and send our counts back
-    # to master
-    rank = comm.Get_rank()
-    size = comm.Get_size()
-
-    counts = do_work(rank, db, size, sadb)
-    comm.send(counts, dest=MASTER_RANK, tag=MASTER_RANK)
+def get_tweets_in_range(ux,uy,bx,by, data_set):
+    '''get tweets in a certain geographical range'''
+    data = []
+    for doc in data_set:
+        try:
+            coor = doc['coordinates']
+            if bx<=coor[0]<=ux and by<=coor[1]<=uy:
+                tweet = {'id':doc['id'],'text':doc['text']}
+                data.append(tweet)
+        except:
+            continue
+    return data
+            
         
-def main():
-    # Work out our rank, and run either master or slave process
-    comm = MPI.COMM_WORLD
-    rank = comm.Get_rank()
-    couch = couchdb.Server('http://115.146.84.252:5432/')
-    db = couch['tweets']
-    sadb = couch['sentiment-analysis-tweets']
-    if rank == 0 :
-        # We are master
-        master_work_processor(comm, db, sadb)
-        print('in master')
-    else:
-        # We are slave
-        slave_work_processor(comm, db, sadb)
-        print('in slave')
-
-# Run the actual program
-if __name__ == "__main__":
-    main()
-                      
-
