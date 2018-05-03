@@ -81,6 +81,7 @@ class Fetcher:
                 self.tweets.clear()
             except Exception as e:
                 # if no response, then no connection
+                ### ### ### change master
                 self.change_master()
                 None
             

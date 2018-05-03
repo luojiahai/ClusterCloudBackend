@@ -103,14 +103,14 @@ def initialize(argv):
             # if not myself
             requests.post(master + "/api/broadcast", data = {'ip': con['ip'], 'port': con['port']})
 
+    # if myself is master, then do fetch
+    if (host in master):
+        t1 = threading.Thread(target=fetcher.listen)
+        t1.start()
+
+        t2 = threading.Thread(target=fetcher.request_work)
+        t2.start()
 
 if __name__ == '__main__':
     initialize(sys.argv[1:])
-
-    t1 = threading.Thread(target=fetcher.listen)
-    t1.start()
-
-    t2 = threading.Thread(target=fetcher.request_work)
-    t2.start()
-
     app.run(threaded=True, debug=False)
