@@ -6,6 +6,9 @@ import json
 import couchdb
 import time
 import threading
+import requests
+
+master = 'http://127.0.0.1' + ':' + '5000'
 
 couch = couchdb.Server()
 db = couch['tweets_']
@@ -43,6 +46,13 @@ class MyListener(StreamListener):
         return True
 
 twitter_melbourne_stream = Stream(auth, MyListener())
+
+def test_connection():
+    try:
+        content = requests.get(master + '/api/connect').content
+        return True
+    except Exception as e:
+        return False
 
 def listen():
     twitter_melbourne_stream.filter(locations=[113.6594,-43.00311,153.61194,-12.46113])
