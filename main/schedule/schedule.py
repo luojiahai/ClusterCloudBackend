@@ -1,14 +1,25 @@
-workers = {}
+class Scheduler:
+    def __init__(self):
+        self.workers = {}
+        self.pool = []
 
-def addWorker(worker):
-    workers[worker['ip']] = {'port': worker['port'], 'working': False}
+    def getWorkers(self):
+        return self.workers
 
-def deleteWorker(ip):
-    del workers[ip]
+    def addWorker(self, worker):
+        self.workers[worker['ip']] = {'port': worker['port'], 'working': False}
 
-def hasWorker(ip):
-    return ip in workers
+    def deleteWorker(self, ip):
+        del self.workers[ip]
 
-def schedule():
-    None
+    def hasWorker(self, ip):
+        return ip in self.workers
 
+    def addTask(self, task):
+        self.pool.append(task)
+
+    def run(self, tasks):
+        # do something with the tasks
+        None
+
+scheduler = Scheduler()
