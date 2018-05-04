@@ -1,18 +1,22 @@
 import couchdb
 
 class Worker:
+    # database
     couch = couchdb.Server()
     tweets_db = couch['tweets_']
     sa_tweets_db = couch['sentiment-analysis-tweets_']
 
+    # constructor
     def __init__(self):
         None
     
+    # analysis function
     def analyse(self, text):
         # do sentiment analysis here
         ### ### ###
         return 0.5
 
+    # work
     def run_work(self, tasks):
         for task in tasks:
             try:
@@ -34,4 +38,3 @@ class Worker:
             except KeyError as e:
                 continue
         print("RUN_WORK: WORK DONE")
-        
