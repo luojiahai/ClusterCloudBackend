@@ -10,7 +10,7 @@ import requests
 app = Flask(__name__)
 
 # default master
-master = "http://127.0.0.1:5000"
+master = 'http://'
 
 # my hostname and portnumber
 my_host = ''
@@ -32,7 +32,7 @@ def connect():
     if request.method == 'POST':
         data = request.json
         if (fetcher.has_connection(data['ip'])):
-            return "ROUTE /api/connect POST: WORKER EXISTED"
+            return "ROUTE /api/connect POST: CONNECTION EXISTED"
         else:
             # add to connections and workers list
             fetcher.add_connection(data)
@@ -81,8 +81,6 @@ def broadcast():
                 scheduler.add_worker(con)
             if (not fetcher.has_connection(con['ip'])):
                 fetcher.add_connection(con)
-            else:
-                print("ROUTE /api/broadcast POST: CON EXIST " + con['ip'] + ":" + con['port'])
         return "ROUTE /api/broadcast POST: BROADCAST DONE"
     return '''
         ROUTE /api/broadcast GET: 
@@ -97,20 +95,25 @@ def broadcast():
 def initialize(argv):
     # command line arguments
     try:
-        opts, args = getopt.getopt(argv, "h:p:", ["host=","port="])
+        opts, args = getopt.getopt(argv, "a:b:c:d:", ["masterhost=","masterport","host=","port="])
     except getopt.GetoptError:
-        print('usage: restful.py -h {HOST_NAME} -p {PORT_NUMBER}')
+        print('usage: restful.py -a {MASTER_HOST_NAME} -b {MASTER_PORT_NUMBER} -c {MY_HOST_NAME} -d {MY_PORT_NUMBER}')
         sys.exit(2)
-    if (len(opts) != 2):
-        print('usage: restful.py -h {HOST_NAME} -p {PORT_NUMBER}')
+    if (len(opts) != 4):
+        print('usage: restful.py -a {MASTER_HOST_NAME} -b {MASTER_PORT_NUMBER} -c {MY_HOST_NAME} -d {MY_PORT_NUMBER}')
         sys.exit(2)
     for opt, arg in opts:
-        if opt in ("-h", "--host"):
-            global my_host
+        global master
+        global my_host
+        global my_port
+        if opt in ("-a", "--host"):
             my_host = str(arg)
-        elif opt in ("-p", "--port"):
-            global my_port
+        elif opt in ("-b", "--port"):
             my_port = str(arg)
+        elif opt in ("-c", "--masterhost"):
+            master += str(arg)
+        elif opt in ("-d", "--masterport"):
+            master += ':' + str(arg)
     
     # add myself to workers and connections
     worker = {'ip': my_host, 'port': my_port}
