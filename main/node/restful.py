@@ -21,7 +21,8 @@ scheduler = Scheduler()
 worker = Worker()
 fetcher = Fetcher(master, scheduler)
 
-# RESTful routing
+# ============================= restful routing ============================= #
+
 @app.route('/')
 def index():
     return 'HELLO, WORLD!'
@@ -52,7 +53,7 @@ def schedule():
     return '''
         ROUTE /api/schedule GET: 
         {
-            "tasks" : [{TWEET_ID}]
+            "tasks" : [TWEET_ID]
         }
     '''
 
@@ -65,7 +66,7 @@ def work():
     return '''
         ROUTE /api/work GET: 
         {
-            "tasks" : [{TWEET_ID}]
+            "tasks" : [TWEET_ID]
         }
     '''
 
@@ -84,9 +85,11 @@ def broadcast():
     return '''
         ROUTE /api/broadcast GET: 
         {
-            "connections" : [{WORKER}]
+            "connections" : [{CONNECTION where "ip": HOSTNAME, "port": PORTNUMBER}]
         }
     '''
+
+# =========================================================================== #
 
 # initialize a conneciton
 def initialize(argv):

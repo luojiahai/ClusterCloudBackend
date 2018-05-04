@@ -28,14 +28,13 @@ class Fetcher:
     # constructor
     def __init__(self, default_master, scheduler):
         self.master = default_master
-        self.connections = []
+        self.connections = []   # list of {"ip": HOST_NAME, "port": PORT_NUMBER}
         self.scheduler = scheduler
 
     # add connection con to connetions list
     def add_connection(self, con):
         self.connections.append({'ip': con['ip'], 'port': con['port']})
-        # con {"ip": HOST_NAME, "port": PORT_NUMBER}
-
+    
     # get conncetions list
     def get_connections(self):
         return self.connections

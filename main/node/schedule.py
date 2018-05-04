@@ -3,7 +3,7 @@ import requests
 class Scheduler:
     # constructor
     def __init__(self):
-        self.workers = []   # worker {"ip": HOST_NAME, "port": PORT_NUMBER, "working": IS_WORKING}
+        self.workers = {}   # "HOST_NAME": {"ip": HOST_NAME, "port": PORT_NUMBER, "working": IS_WORKING}
         self.pool = []      # pool
 
     # get workers list
@@ -12,22 +12,18 @@ class Scheduler:
 
     # add worker to workers list
     def add_worker(self, worker):
-        self.workers.append({'ip': worker['ip'], 'port': worker['port'], 'working': False})
-        # worker {"ip": HOST_NAME, "port": PORT_NUMBER, "working": IS_WORKING}
+        self.workers[worker['ip']] = {'ip': worker['ip'], 'port': worker['port'], 'working': False}
     
     # delete a worker by given ip addr
     def delete_worker(self, ip):
-        for worker in self.workers:
-            if (worker['ip'] == ip):
-                self.workers.remove(worker)
-                break
+        try:
+            del self.workers[ip]
+        except KeyError as e:
+            print("DELETE_WORKER: KEYERROR")
     
     # check if given ip addr contains in workers list
     def has_worker(self, ip):
-        for worker in self.workers:
-            if (worker['ip'] == ip):
-                return True
-        return False
+        return ip in self.workers
 
     # request to a worker for doing work
     def do_work(self, worker, tasks):
