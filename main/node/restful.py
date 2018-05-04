@@ -34,13 +34,15 @@ def connect():
         if (fetcher.has_connection(data['ip'])):
             return "ROUTE /api/connect POST: WORKER EXISTED"
         else:
+            # add to connections and workers list
             fetcher.add_connection(data)
             scheduler.add_worker(data)
             # broadcast to all other connections
+            data = {'connections': fetcher.get_connections()}
             for con in fetcher.get_connections():
+                # if con is not myself
                 if (my_host not in con['ip']):
-                    # if not myself
-                    requests.post(master + "/api/broadcast", data = {'ip': con['ip'], 'port': con['port']})
+                    requests.post("http://" + con['ip'] + ":" + con['port'] + "/api/broadcast", data = data)
             return "ROUTE /api/connect POST: CONNECT SUCCESS"
     return json.dumps(scheduler.get_workers())
 
@@ -104,9 +106,11 @@ def initialize(argv):
         sys.exit(2)
     for opt, arg in opts:
         if opt in ("-h", "--host"):
-            my_host = arg
+            global my_host
+            my_host = str(arg)
         elif opt in ("-p", "--port"):
-            my_port = arg
+            global my_port
+            my_port = str(arg)
     
     # add myself to workers and connections
     worker = {'ip': my_host, 'port': my_port}
@@ -133,4 +137,4 @@ def initialize(argv):
 # main
 if __name__ == '__main__':
     initialize(sys.argv[1:])
-    app.run(threaded=True, debug=False)
+    app.run(threaded=True, debug=False, port=int(my_port))

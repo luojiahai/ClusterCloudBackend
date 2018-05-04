@@ -28,7 +28,7 @@ class Worker:
                 id_str = tweet['_id']               # get the id
                 coordinates = tweet['coordinates']  # get the coordinates
 
-                print("==================")
+                print("========================")
                 print("ANALYSING: " + text)
                 
                 # save data to sa_tweets_db
