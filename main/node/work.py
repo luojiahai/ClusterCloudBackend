@@ -33,3 +33,5 @@ class Worker:
                                 } # maybe more to save
             except KeyError as e:
                 continue
+        print("RUN_WORK: WORK DONE")
+        

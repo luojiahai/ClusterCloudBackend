@@ -23,26 +23,38 @@ class Fetcher:
 
     tweets = []
 
-    def __init__(self, default_master):
+    def __init__(self, default_master, scheduler):
         self.master = default_master
         self.connections = []
+        self.scheduler = scheduler
     
     def add_connection(self, con):
         self.connections.append({'ip': con['ip'], 'port': con['port']})
-        # {"ip": HOST_NAME, "port": PORT_NUMBER}
+        # con {"ip": HOST_NAME, "port": PORT_NUMBER}
 
     def get_connections(self):
         return self.connections
 
-    def has_connection(self, con):
+    def has_connection(self, ip):
         for connection in self.connections:
             if (connection['ip'] == ip):
                 return True
         return False
 
     def change_master(self):
-        # choose a new master
-        con = {'ip': 'hostname', 'port': 'port'}
+        # delete the disconnected master
+        for connection in self.connections:
+            if (connection['ip'] in self.master):
+                self.connections.remove(connection)
+                # delete its worker as well
+                self.scheduler.delete_worker(connection['ip'])
+                break
+        
+        # sort the list of connections
+        self.connections = sorted(self.connections, key=lambda k: k['ip']) 
+        
+        # choose ans set a new master - the first con in the list
+        con = self.connections[0]
         self.master = 'http://' + con['ip'] + ':' + con['port']
 
     class MyListener(StreamListener):
@@ -69,9 +81,12 @@ class Fetcher:
         twitter_melbourne_stream = Stream(self.auth, self.MyListener())
         twitter_melbourne_stream.filter(locations=[113.6594,-43.00311,153.61194,-12.46113])
 
-    def request_work(self):
+    def request_schedule(self):
         while True:
             time.sleep(30)
+
+            for worker in self.scheduler.get_workers():
+                print(worker)
 
             data = {'tasks': self.tweets}
             try:
@@ -80,8 +95,6 @@ class Fetcher:
                 print(r)
                 self.tweets.clear()
             except Exception as e:
-                # if no response, then no connection
-                ### ### ### change master
+                # if no response, then change master
                 self.change_master()
-                None
             

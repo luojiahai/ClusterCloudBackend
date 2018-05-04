@@ -9,12 +9,19 @@ import requests
 
 app = Flask(__name__)
 
+# default master
 master = "http://127.0.0.1:5000"
 
+# my hostname and portnumber
+my_host = ''
+my_port = ''
+
+# instances of functional module
 scheduler = Scheduler()
 worker = Worker()
-fetcher = Fetcher(master)
+fetcher = Fetcher(master, scheduler)
 
+# RESTful routing
 @app.route('/')
 def index():
     return 'HELLO, WORLD!'
@@ -23,10 +30,16 @@ def index():
 def connect():
     if request.method == 'POST':
         data = request.json
-        if (scheduler.has_worker(data['ip'])):
+        if (fetcher.has_connection(data['ip'])):
             return "ROUTE /api/connect POST: WORKER EXISTED"
         else:
+            fetcher.add_connection(data)
             scheduler.add_worker(data)
+            # broadcast to all other connections
+            for con in fetcher.get_connections():
+                if (my_host not in con['ip']):
+                    # if not myself
+                    requests.post(master + "/api/broadcast", data = {'ip': con['ip'], 'port': con['port']})
             return "ROUTE /api/connect POST: CONNECT SUCCESS"
     return json.dumps(scheduler.get_workers())
 
@@ -75,9 +88,9 @@ def broadcast():
         }
     '''
 
+# initialize a conneciton
 def initialize(argv):
-    host = ''
-    port = ''
+    # command line arguments
     try:
         opts, args = getopt.getopt(argv, "h:p:", ["host=","port="])
     except getopt.GetoptError:
@@ -88,29 +101,33 @@ def initialize(argv):
         sys.exit(2)
     for opt, arg in opts:
         if opt in ("-h", "--host"):
-            host = arg
+            my_host = arg
         elif opt in ("-p", "--port"):
-            port = arg
+            my_port = arg
     
     # add myself to workers and connections
-    worker = {'ip': host, 'port': port}
+    worker = {'ip': my_host, 'port': my_port}
     scheduler.add_worker(worker)
     fetcher.add_connection(worker)
 
-    # broadcast
-    for con in fetcher.get_connections():
-        if (host not in con['ip']):
-            # if not myself
-            requests.post(master + "/api/broadcast", data = {'ip': con['ip'], 'port': con['port']})
+    # connect to master if me not master
+    if (my_host not in master):
+        requests.post(master + "/api/connect", data = {'ip': my_host, 'port': my_port})
 
-    # if myself is master, then do fetch
-    if (host in master):
+    # if myself is master
+    if (my_host in master):
+        # start listenr thread for harvesting tweets
         t1 = threading.Thread(target=fetcher.listen)
         t1.start()
-
-        t2 = threading.Thread(target=fetcher.request_work)
+        # start request_schedule thread for requesting schedule every 30s
+        t2 = threading.Thread(target=fetcher.request_schedule)
         t2.start()
+    # if myself is not master
+    else:
+        t1 = threading.Thread(target=fetcher.request_schedule)
+        t1.start()
 
+# main
 if __name__ == '__main__':
     initialize(sys.argv[1:])
     app.run(threaded=True, debug=False)

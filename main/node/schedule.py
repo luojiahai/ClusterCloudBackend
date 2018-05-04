@@ -10,7 +10,7 @@ class Scheduler:
 
     def add_worker(self, worker):
         self.workers.append({'ip': worker['ip'], 'port': worker['port'], 'working': False})
-        # {"ip": HOST_NAME, "port": PORT_NUMBER, "working": IS_WORKING}
+        # worker {"ip": HOST_NAME, "port": PORT_NUMBER, "working": IS_WORKING}
         
     def delete_worker(self, ip):
         for worker in self.workers:
@@ -28,7 +28,6 @@ class Scheduler:
         data = {'tasks': tasks}
         requests.post('http://' + worker['ip'] + ':' + worker['port'] + '/api/work', json=data)
 
-
     def run_schedule(self, tasks):
         # do something with the tasks, please multi-threaded and organise pool
         ### ### ###
@@ -41,4 +40,3 @@ class Scheduler:
         ### ### ### this is a simple one, should divide tasks to workers and do multi-thread
         for worker in self.workers:
             self.do_work(worker, tasks)
-
