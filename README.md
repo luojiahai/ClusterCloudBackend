@@ -2,22 +2,17 @@
 
 ## Libraries
 
-Install Flask-RESTful
+Install Flask
+
 ```
-pip install flask-restful
-git clone https://github.com/flask-restful/flask-restful.git
-cd flask-restful
-python setup.py develop
+pip install flask
 ```
 
-Run
-```
-python api.py
-```
+Run API
 
-Example
-
-https://flask-restful.readthedocs.io/en/latest/quickstart.html#a-minimal-api
+```
+python restful.py -a {MASTER_HOST_NAME} -b {MASTER_PORT_NUMBER} -c {MY_HOST_NAME} -d {MY_PORT_NUMBER}
+```
 
 db docs
 
