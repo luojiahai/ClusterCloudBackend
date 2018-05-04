@@ -29,16 +29,32 @@ class Scheduler:
     def has_worker(self, ip):
         return ip in self.workers
 
+    # organize the pool
+    ### not perfect version, may have bugs
     def organize_pool(self, tasks):
-        ### ### ### organize pool
-        for key in self.pool.keys():
-            self.pool[key] = tasks
-            break
-
+        # if number of tasks less than size of pool
+        if (len(tasks) <= len(self.pool)):
+            for key in self.pool.keys():
+                self.pool[key] = list(tasks)
+                break
+        else:
+            ntasks_per_worker = int(len(tasks)/len(self.pool))
+            i = 0
+            for key in self.pool.keys():
+                # last one
+                if (len(tasks)-i-ntasks_per_worker < ntasks_per_worker):
+                    # slide til the end
+                    self.pool[key] = tasks[i:]
+                else:
+                    self.pool[key] = tasks[i:i+ntasks_per_worker]
+                    i += ntasks_per_worker
+            
     # request to a worker for doing work
     def do_work(self, worker, tasks):
+        self.workers[worker['ip']]['working'] = True
         data = {'tasks': tasks}
         requests.post('http://' + worker['ip'] + ':' + worker['port'] + '/api/work', json=data)
+        self.workers[worker['ip']]['working'] = False
 
     # scheduling
     def run_schedule(self, tasks):
@@ -53,9 +69,13 @@ class Scheduler:
 
         # request to work
         for worker_k, worker_v in self.workers.items():
-            tasks = list(self.pool[worker_k])   # copy instead of reference
-            self.pool[worker_k] = []            # clear after copy
-            # start a thread
-            t = threading.Thread(target=self.do_work, args=(worker_v, tasks))
-            self.threads.append(t)
-            t.start()
+            # if the worker running a job, then skip
+            if (worker_v['working']):
+                continue
+            else:
+                tasks = list(self.pool[worker_k])   # copy instead of reference
+                self.pool[worker_k] = []            # clear after copy
+                # start a thread
+                t = threading.Thread(target=self.do_work, args=(worker_v, tasks))
+                self.threads.append(t)
+                t.start()
