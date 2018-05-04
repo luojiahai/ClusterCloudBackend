@@ -1,7 +1,9 @@
 # Import regular expressions to look for topics and mentions, json to parse tweet data
 import re, json, operator
 from collections import defaultdict as dd
-import textBlob
+import textblob
+from textblob import TextBlob
+from textblob.np_extractors import ConllExtractor
 
     
 def extract_hashtags(text):
@@ -61,4 +63,14 @@ def get_sentiment_data(data_set):
              'avg_subjectivity':avg_subjectivity,
              'num_docs': num_docs}
     return stats
-        
+
+def extract_phrase(text):
+    '''take a preprocessed tweet and return a dict of noun
+       phrases and counts as value'''
+    extractor = ConllExtractor()
+    blob = TextBlob(text)
+    return blob.np_counts
+
+
+#test goes here
+print(extract_phrase('this is a test and good evening!'))
