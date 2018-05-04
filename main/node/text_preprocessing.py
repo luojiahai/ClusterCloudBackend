@@ -5,6 +5,18 @@ import textblob
 from textblob import TextBlob
 from textblob.np_extractors import ConllExtractor
 
+def one_button_start(text):
+    print("bang~bang~bang~all start with a big bang~~~bang~")
+    b = TextBlob(text)
+    language = b.detect_language()
+    spell_correctness = True
+    if text != b.correct():
+        spell_correctness = False
+    p,s = sentiment_analyze(text)
+    words,sentences = tokenize(text)
+    noun_phrases = extract_phrash(text)
+    analysis_box =(language, spell_correctness, p,s,words,sentences, noun_phrases)
+    return analysis_box
     
 def extract_hashtags(text):
     '''take a raw tweet and return a list of hashtags'''
@@ -35,6 +47,21 @@ def create_hashtag_dict(data_set):
         for tag in tags:
             hashtag_dict[tag].append(doc_id)
     return hashtag_dict
+
+
+def spell_check(text):
+    correct = True
+    b = TextBlob(text)
+    if text != b.correct():
+        correct = False
+    return correct
+
+def tokenize(text):
+    '''take a tweet and return tokenized word list and list of sentences'''
+    zen = TextBlob(text)
+    words = zen.words
+    sentences = zen.sentences
+    return (words, sentences)
 
 def get_tweets_in_range(ux,uy,bx,by, data_set):
     '''get tweets in a certain geographical range'''
@@ -73,4 +100,4 @@ def extract_phrase(text):
 
 
 #test goes here
-print(extract_phrase('this is a test and good evening!'))
+#print(extract_phrase('this is a test and good evening!'))
