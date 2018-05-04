@@ -92,16 +92,12 @@ class Fetcher:
     # request for scheduling
     def request_schedule(self):
         while True:
-            time.sleep(30)
-
-            for worker in self.scheduler.get_workers():
-                print(worker)
+            time.sleep(30)  # 30 seconds
 
             data = {'tasks': self.tweets}
             try:
                 # request to schedule
                 r = requests.post(self.master + "/api/schedule", json=data)
-                print(r)
                 self.tweets.clear()
             except Exception as e:
                 # if no response, then change master

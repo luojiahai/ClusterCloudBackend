@@ -12,12 +12,13 @@ class Worker:
     
     # analysis function
     def analyse(self, text):
-        # do sentiment analysis here
-        ### ### ###
+        ### ### ### sentiment analysis
         return 0.5
 
     # working
     def run_work(self, tasks):
+        print("---------DEBUG----------RUN_WORK")
+        print("RUNNING WORK: ")
         for task in tasks:
             try:
                 # get neccessary data
@@ -27,8 +28,9 @@ class Worker:
                 id_str = tweet['_id']               # get the id
                 coordinates = tweet['coordinates']  # get the coordinates
 
-                print("analysed: " + text)
-
+                print("==================")
+                print("ANALYSING: " + text)
+                
                 # save data to sa_tweets_db
                 self.sa_tweets_db[id_str] = {
                                     'text': text, 
@@ -37,4 +39,4 @@ class Worker:
                                 } # maybe more to save
             except KeyError as e:
                 continue
-        print("RUN_WORK: WORK DONE")
+        print("---------DEBUG---------/RUN_WORK")
