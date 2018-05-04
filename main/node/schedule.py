@@ -37,8 +37,10 @@ class Scheduler:
 
     # request to a worker for doing work
     def do_work(self, worker, tasks):
+        self.workers[worker['ip']]['working'] = True
         data = {'tasks': tasks}
         requests.post('http://' + worker['ip'] + ':' + worker['port'] + '/api/work', json=data)
+        self.workers[worker['ip']]['working'] = False
 
     # scheduling
     def run_schedule(self, tasks):
@@ -53,9 +55,13 @@ class Scheduler:
 
         # request to work
         for worker_k, worker_v in self.workers.items():
-            tasks = list(self.pool[worker_k])   # copy instead of reference
-            self.pool[worker_k] = []            # clear after copy
-            # start a thread
-            t = threading.Thread(target=self.do_work, args=(worker_v, tasks))
-            self.threads.append(t)
-            t.start()
+            # if the worker running a job, then skip
+            if (worker_v['working']):
+                continue
+            else:
+                tasks = list(self.pool[worker_k])   # copy instead of reference
+                self.pool[worker_k] = []            # clear after copy
+                # start a thread
+                t = threading.Thread(target=self.do_work, args=(worker_v, tasks))
+                self.threads.append(t)
+                t.start()
