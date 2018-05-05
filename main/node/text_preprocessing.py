@@ -14,8 +14,8 @@ def one_button_start(text):
         spell_correctness = False
     p,s = sentiment_analyze(text)
     words,sentences = tokenize(text)
-    noun_phrases = extract_phrash(text)
-    analysis_box =(language, spell_correctness, p,s,words,sentences, noun_phrases)
+    noun_phrases = extract_phrase(text)
+    analysis_box =(language, spell_correctness, p, s, words, sentences, noun_phrases)
     return analysis_box
     
 def extract_hashtags(text):
@@ -29,9 +29,9 @@ def extract_hashtags(text):
 
 def sentiment_analyze(text):
     '''take a tweet without hashtags and return sentiment values'''
-    testimonial1 = TextBlob(text)
-    text = testimonial.correct()
-    testimonial2 = TextBlob(text)
+    testimonial = TextBlob(text)
+    text2 = str(testimonial.correct())
+    testimonial2 = TextBlob(text2)
     polarity = testimonial2.sentiment.polarity
     subjectivity = testimonial2.sentiment.subjectivity
     return (polarity, subjectivity)
@@ -96,7 +96,7 @@ def extract_phrase(text):
        phrases and counts as value'''
     extractor = ConllExtractor()
     blob = TextBlob(text)
-    return blob.np_counts
+    return dict(blob.np_counts)
 
 
 #test goes here

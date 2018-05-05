@@ -1,5 +1,6 @@
 import couchdb
 from text_preprocessing import *
+
 class Worker:
     # database
     couch = couchdb.Server()
@@ -40,18 +41,25 @@ class Worker:
                 print("========================")
                 print("ANALYSING: " + text)
                 
+                noun_phrases_dict = {}
+                for k, v in box[6].items():
+                    noun_phrases_dict[str(k)] = v
+                
+                sentences = []
+                for sentence in box[5]:
+                    sentences.append(str(sentence))
+                
                 # save data to sa_tweets_db
                 self.sa_tweets_db[id_str] = {
-                                    'text': text, 
-                                    'score': score, 
+                                    'text': text,
                                     'coordinates': coordinates,
-                                    'language':box[0],
-                                    'spell_correctness':box[1],
-                                    'polarity':box[2],
-                                    'subjectivity':box[3],
-                                    'words':box[4],
-                                    'sentences':box[5],
-                                    'noun_phrases':box[6]
+                                    'language': box[0],
+                                    'spell_correctness': box[1],
+                                    'polarity': box[2],
+                                    'subjectivity': box[3],
+                                    'words': box[4],
+                                    'sentences': sentences,
+                                    'noun_phrases': noun_phrases_dict
                                 } # maybe more to save
             except KeyError as e:
                 continue
