@@ -12,10 +12,14 @@ def one_button_start(text):
     spell_correctness = True
     if text != b.correct():
         spell_correctness = False
-    p,s = sentiment_analyze(text)
-    words,sentences = tokenize(text)
-    noun_phrases = extract_phrase(text)
-    analysis_box =(language, spell_correctness, p, s, words, sentences, noun_phrases)
+    text = b.correct()
+    b1 = TextBlob(text)
+    p = b1.sentiment.polarity
+    s = b1.sentiment.subjectivity
+    words = b2.words
+    sentences = b2.sentences
+    noun_phrases = b2.np_counts
+    analysis_box =(language, spell_correctness, p,s,words,sentences, noun_phrases)
     return analysis_box
     
 def extract_hashtags(text):
