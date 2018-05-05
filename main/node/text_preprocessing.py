@@ -12,13 +12,13 @@ def one_button_start(text):
     spell_correctness = True
     if text != b.correct():
         spell_correctness = False
-    text = b.correct()
+    text = str(b.correct())
     b1 = TextBlob(text)
     p = b1.sentiment.polarity
     s = b1.sentiment.subjectivity
-    words = b2.words
-    sentences = b2.sentences
-    noun_phrases = b2.np_counts
+    words = b1.words
+    sentences = b1.sentences
+    noun_phrases = b1.np_counts
     analysis_box =(language, spell_correctness, p,s,words,sentences, noun_phrases)
     return analysis_box
     
