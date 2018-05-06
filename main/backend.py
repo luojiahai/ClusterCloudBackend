@@ -6,7 +6,7 @@ from flask_cors import CORS
 app = Flask(__name__)
 CORS(app)
 
-couch = couchdb.Server('http://115.146.95.53:5432/')
+couch = couchdb.Server('http://localhost:5432/')
 db = couch['sentiment-analysis-tweets_']
 
 @app.route("/")
@@ -45,4 +45,4 @@ def get2():
     return Response(json.dumps(response), mimetype="application/json")
 
 if __name__ == '__main__':
-    app.run(threaded=True, debug=False, port=4000)
+    app.run(threaded=True, debug=False, host="115.146.95.53", port=4000)
