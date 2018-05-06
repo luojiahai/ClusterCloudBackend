@@ -54,10 +54,10 @@ if __name__ == '__main__':
     try:
         opts, args = getopt.getopt(argv, "h:p", ["host=", "port="])
     except getopt.GetoptError:
-        print('usage: backend.py -h {HOST_NAME}')
+        print('usage: backend.py -h {HOST_NAME} -p {PORT_NUMBER}')
         sys.exit(2)
-    if (len(opts) != 4):
-        print('usage: backend.py -h {HOST_NAME}')
+    if (len(opts) != 2):
+        print('usage: backend.py -h {HOST_NAME} -p {PORT_NUMBER}')
         sys.exit(2)
     for opt, arg in opts:
         if opt in ("-h", "--host"):
