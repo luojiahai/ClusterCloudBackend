@@ -42,7 +42,7 @@ def connect():
             for con in fetcher.get_connections():
                 # if con is not myself
                 if (my_host not in con['ip']):
-                    requests.post("http://" + con['ip'] + ":" + con['port'] + "/api/broadcast", data = data)
+                    requests.post("http://" + con['ip'] + ":" + con['port'] + "/api/broadcast", json=data)
             return "ROUTE /api/connect POST: CONNECT SUCCESS"
     return json.dumps(fetcher.get_connections())
 
@@ -128,7 +128,7 @@ def initialize(argv):
     if (my_host not in master):
         uri_str = "http://admin:admin@{}:5986/_nodes/couchdb@{}".format(master_host, my_host)
         requests.put(uri_str, data={})
-        requests.post(master + "/api/connect", data = {'ip': master_host, 'port': master_port})
+        requests.post(master + "/api/connect", json={'ip': my_host, 'port': my_port})
 
     # if myself is master
     if (my_host in master):
