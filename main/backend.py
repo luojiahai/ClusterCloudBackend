@@ -28,7 +28,8 @@ def get1():
                 "geometry": row.key,
                 "properties": {
                     "id": row.id,
-                    "polarity": row.value
+                    "polarity": row.value,
+                    "coordinates": row.key["coordinates"]
                 }
             }
         response["features"].append(feature)
