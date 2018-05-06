@@ -47,6 +47,26 @@ def get2():
         response.append(obj)
     return Response(json.dumps(response), mimetype="application/json")
 
+@app.route("/get4")
+def get4():
+    rows = db.view("test-doc/new-view-04")
+    response = {
+            "type": "FeatureCollection",
+            "features": []
+        }
+    for row in rows:
+        feature = {
+                "type": "Feature",
+                "geometry": row.key,
+                "properties": {
+                    "id": row.id,
+                    "correctness": row.value,
+                    "coordinates": row.key["coordinates"]
+                }
+            }
+        response["features"].append(feature)
+    return Response(json.dumps(response), mimetype="application/json")
+
 if __name__ == '__main__':
     argv = sys.argv[1:]
     host = ''
