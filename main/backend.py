@@ -1,3 +1,5 @@
+import sys
+import getopt
 from flask import Flask, Response
 import couchdb
 import json
@@ -45,4 +47,22 @@ def get2():
     return Response(json.dumps(response), mimetype="application/json")
 
 if __name__ == '__main__':
-    app.run(threaded=True, debug=False, host="115.146.95.53", port=4000)
+    argv = sys.argv[1:]
+    host = ''
+    port = ''
+    # command line arguments
+    try:
+        opts, args = getopt.getopt(argv, "h:p", ["host=", "port="])
+    except getopt.GetoptError:
+        print('usage: backend.py -h {HOST_NAME}')
+        sys.exit(2)
+    if (len(opts) != 4):
+        print('usage: backend.py -h {HOST_NAME}')
+        sys.exit(2)
+    for opt, arg in opts:
+        if opt in ("-h", "--host"):
+            host = str(arg)
+        elif opt in ("-p", "--port"):
+            port = str(arg)
+
+    app.run(threaded=True, debug=False, host=host, port=port)
