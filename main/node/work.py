@@ -3,7 +3,7 @@ from text_preprocessing import *
 
 class Worker:
     # database
-    couch = couchdb.Server()
+    couch = couchdb.Server('http://localhost:5432/')
     tweets_db = couch['tweets_']
     sa_tweets_db = couch['sentiment-analysis-tweets_']
 
@@ -60,6 +60,7 @@ class Worker:
                                     'sentences': sentences,
                                     'noun_phrases': noun_phrases_dict
                                 } # maybe more to save
-            except KeyError as e:
+            except Exception as e:
+                print("RUN_WORK EXCEPTION CATCHED: " + str(e))
                 continue
         print("---------DEBUG---------/RUN_WORK")

@@ -19,7 +19,7 @@ class Fetcher:
     api = tweepy.API(auth)
 
     # database
-    couch = couchdb.Server()
+    couch = couchdb.Server('http://localhost:5432/')
     db = couch['tweets_']
 
     # tweets pool
@@ -100,6 +100,7 @@ class Fetcher:
                 r = requests.post(self.master + "/api/schedule", json=data)
                 self.tweets.clear()
             except Exception as e:
+                print("REQUEST_SCHEDULE EXCEPTION CATCHED: " + str(e))
                 # if no response, then change master
                 self.change_master()
             
