@@ -93,6 +93,7 @@ def broadcast():
 
 # initialize a conneciton
 def initialize(argv):
+    master_host = ''
     # command line arguments
     try:
         opts, args = getopt.getopt(argv, "a:b:c:d:", ["masterhost=","masterport","host=","port="])
@@ -111,6 +112,7 @@ def initialize(argv):
         elif opt in ("-b", "--port"):
             my_port = str(arg)
         elif opt in ("-c", "--masterhost"):
+            master_host = str(arg)
             master += str(arg)
         elif opt in ("-d", "--masterport"):
             master += ':' + str(arg)
@@ -122,6 +124,8 @@ def initialize(argv):
 
     # connect to master if me not master
     if (my_host not in master):
+        uri_str = "http://admin:admin@{}:5986/_nodes/couchdb@{}".format(master_host, my_host)
+        requests.put(uri_str, data={})
         requests.post(master + "/api/connect", data = {'ip': my_host, 'port': my_port})
 
     # if myself is master
