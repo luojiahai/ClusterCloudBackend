@@ -65,4 +65,4 @@ if __name__ == '__main__':
         elif opt in ("-p", "--port"):
             port = str(arg)
 
-    app.run(threaded=True, debug=False, host=host, port=port)
+    app.run(threaded=True, debug=False, host=host, port=int(port))
