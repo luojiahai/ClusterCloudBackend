@@ -6,7 +6,7 @@ couch = couchdb.Server('http://115.146.95.53:5432/')
 db = couch['tweets']
 
 skip = 0
-limit = 10
+limit = 100
 
 while True:
     uri = "http://readonly:ween7ighai9gahR6@45.113.232.90/couchdbro/twitter/_design/twitter/_view/summary?include_docs=true&reduce=false&skip={}&limit={}".format(str(skip), str(limit))
