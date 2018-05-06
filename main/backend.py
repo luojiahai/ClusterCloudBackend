@@ -52,7 +52,7 @@ if __name__ == '__main__':
     port = ''
     # command line arguments
     try:
-        opts, args = getopt.getopt(argv, "h:p", ["host=", "port="])
+        opts, args = getopt.getopt(argv, "h:p:", ["host=", "port="])
     except getopt.GetoptError:
         print('usage: backend.py -h {HOST_NAME} -p {PORT_NUMBER}')
         sys.exit(2)
