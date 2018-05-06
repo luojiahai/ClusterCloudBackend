@@ -30,25 +30,11 @@ class Scheduler:
         return ip in self.workers
 
     # organize the pool
-    ### not perfect version, may have bugs
     def organize_pool(self, tasks):
-        # if number of tasks less than size of pool
-        if (len(tasks) <= len(self.pool)):
-            for key in self.pool.keys():
-                self.pool[key] = list(tasks)
-                break
-        else:
-            ntasks_per_worker = int(len(tasks)/len(self.pool))
-            i = 0
-            for key in self.pool.keys():
-                # last one
-                if (len(tasks)-i-ntasks_per_worker < ntasks_per_worker):
-                    # slide til the end
-                    self.pool[key] = tasks[i:]
-                else:
-                    self.pool[key] = tasks[i:i+ntasks_per_worker]
-                    i += ntasks_per_worker
-            
+        for task in tasks:
+            sorted_keys = sorted(self.pool, key=lambda k: len(self.pool[k]))
+            self.pool[sorted_keys[0]].append(task)  # the least tasks worker
+
     # request to a worker for doing work
     def do_work(self, worker, tasks):
         self.workers[worker['ip']]['working'] = True

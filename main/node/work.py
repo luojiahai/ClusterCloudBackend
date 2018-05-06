@@ -51,8 +51,7 @@ class Worker:
                 
                 # save data to sa_tweets_db
                 self.sa_tweets_db[id_str] = {
-                                    'text': text,
-                                    'coordinates': coordinates,
+                                    'doc': tweet,
                                     'language': box[0],
                                     'spell_correctness': box[1],
                                     'polarity': box[2],
