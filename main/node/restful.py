@@ -44,7 +44,7 @@ def connect():
                 if (my_host not in con['ip']):
                     requests.post("http://" + con['ip'] + ":" + con['port'] + "/api/broadcast", data = data)
             return "ROUTE /api/connect POST: CONNECT SUCCESS"
-    return json.dumps(scheduler.get_workers())
+    return json.dumps(fetcher.get_connections())
 
 @app.route('/api/schedule', methods=['GET', 'POST'])
 def schedule():
