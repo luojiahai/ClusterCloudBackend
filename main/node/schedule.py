@@ -69,6 +69,8 @@ class Scheduler:
                 continue
             else:
                 tasks = list(self.pool[worker_k])   # copy instead of reference
+                if (len(tasks) == 0):
+                    continue
                 self.pool[worker_k] = []            # clear after copy
                 # start a thread
                 t = threading.Thread(target=self.request_work, args=(worker_v, tasks))

@@ -26,11 +26,13 @@ class Fetcher:
     tweets = []
 
     # constructor
-    def __init__(self, default_master, scheduler, my_host):
-        self.master = default_master
+    def __init__(self, scheduler, master_host, master_port, my_host, my_port):
+        self.master_host = master_host
+        self.master_port = master_port
         self.connections = []   # list of {"ip": HOST_NAME, "port": PORT_NUMBER}
         self.scheduler = scheduler
         self.my_host = my_host
+        self.my_port = my_port
 
     # add connection con to connetions list
     def add_connection(self, con):
@@ -51,7 +53,7 @@ class Fetcher:
     def change_master(self):
         # delete the disconnected master
         for connection in self.connections:
-            if (connection['ip'] in self.master):
+            if (connection['ip'] in self.master_host):
                 self.connections.remove(connection)
                 # delete its worker as well
                 self.scheduler.delete_worker(connection['ip'])
@@ -62,7 +64,8 @@ class Fetcher:
         
         # choose ans set a new master - the first con in the list
         con = self.connections[0]
-        self.master = 'http://' + con['ip'] + ':' + con['port']
+        self.master_host = con['ip']
+        self.master_port = con['port']
 
     # twitter stream listener class
     class MyListener(StreamListener):
@@ -95,7 +98,9 @@ class Fetcher:
         while True:
             time.sleep(30)  # 30 seconds
 
-            if (self.my_host in self.master):
+            if (self.my_host in self.master_host):
+                print(self.my_host)
+                print(self.master_host)
                 # broadcast to all other connections
                 cons = {'connections': self.connections}
                 for con in self.connections:
@@ -112,7 +117,7 @@ class Fetcher:
             data = {'tasks': self.tweets}
             try:
                 # request to schedule
-                r = requests.post(self.master + "/api/schedule", json=data)
+                r = requests.post("http://" + self.master_host + ":" + self.master_port + "/api/schedule", json=data)
                 self.tweets.clear()
             except Exception as e:
                 print("REQUEST_SCHEDULE EXCEPTION CATCHED: " + str(e))
