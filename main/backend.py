@@ -60,7 +60,6 @@ def get4():
                 "geometry": row.key,
                 "properties": {
                     "id": row.id,
-                    "correctness": row.value,
                     "coordinates": row.key["coordinates"]
                 }
             }
