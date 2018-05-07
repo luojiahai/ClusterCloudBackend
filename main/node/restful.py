@@ -101,10 +101,10 @@ def initialize(argv):
     try:
         opts, args = getopt.getopt(argv, "a:b:c:d:", ["masterhost=","masterport","host=","port="])
     except getopt.GetoptError:
-        print('usage: restful.py -a {MASTER_HOST_NAME} -b {MASTER_PORT_NUMBER} -c {MY_HOST_NAME} -d {MY_PORT_NUMBER}')
+        print('usage: restful.py -a {MY_HOST_NAME} -b {MY_PORT_NUMBER} -c {MASTER_HOST_NAME} -d {MASTER_PORT_NUMBER}')
         sys.exit(2)
     if (len(opts) != 4):
-        print('usage: restful.py -a {MASTER_HOST_NAME} -b {MASTER_PORT_NUMBER} -c {MY_HOST_NAME} -d {MY_PORT_NUMBER}')
+        print('usage: restful.py -a {MY_HOST_NAME} -b {MY_PORT_NUMBER} -c {MASTER_HOST_NAME} -d {MASTER_PORT_NUMBER}')
         sys.exit(2)
     for opt, arg in opts:
         global master_host
