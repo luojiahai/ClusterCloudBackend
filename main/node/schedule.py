@@ -42,10 +42,13 @@ class Scheduler:
         print("TASKS: ")
         for task in tasks:
             print(task)
-        self.workers[worker['ip']]['working'] = True
-        data = {'tasks': tasks}
-        requests.post('http://' + worker['ip'] + ':' + worker['port'] + '/api/work', json=data)
-        self.workers[worker['ip']]['working'] = False
+        try:
+            self.workers[worker['ip']]['working'] = True
+            data = {'tasks': tasks}
+            requests.post('http://' + worker['ip'] + ':' + worker['port'] + '/api/work', json=data)
+            self.workers[worker['ip']]['working'] = False
+        except Exception as e:
+            print(e)
         print("---------DEBUG---------/REQUEST_WORK")
 
     # scheduling

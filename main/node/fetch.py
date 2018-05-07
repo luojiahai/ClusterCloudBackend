@@ -26,10 +26,11 @@ class Fetcher:
     tweets = []
 
     # constructor
-    def __init__(self, default_master, scheduler):
+    def __init__(self, default_master, scheduler, my_host):
         self.master = default_master
         self.connections = []   # list of {"ip": HOST_NAME, "port": PORT_NUMBER}
         self.scheduler = scheduler
+        self.my_host = my_host
 
     # add connection con to connetions list
     def add_connection(self, con):
@@ -94,12 +95,19 @@ class Fetcher:
         while True:
             time.sleep(30)  # 30 seconds
 
-            # broadcast to all other connections
-            cons = {'connections': self.connections}
-            for con in self.connections:
-                # if con is not myself
-                if (con['ip'] not in self.master):
-                    requests.post("http://" + con['ip'] + ":" + con['port'] + "/api/broadcast", json=cons)
+            if (self.my_host in self.master):
+                # broadcast to all other connections
+                cons = {'connections': self.connections}
+                for con in self.connections:
+                    # if con is not myself
+                    if (con['ip'] not in self.my_host):
+                        try:
+                            requests.post("http://" + con['ip'] + ":" + con['port'] + "/api/broadcast", json=cons)
+                        except Exception as e:
+                            # the connection is disconnected
+                            print(e)
+                            self.connections.remove(con)
+                            self.scheduler.delete_worker(con['ip'])
 
             data = {'tasks': self.tweets}
             try:
