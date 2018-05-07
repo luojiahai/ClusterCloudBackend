@@ -41,7 +41,7 @@ def connect():
             data = {'connections': fetcher.get_connections()}
             for con in fetcher.get_connections():
                 # if con is not myself
-                if (my_host not in con['ip']):
+                if ((my_host not in con['ip']) and (con['ip'] not in data['ip'])):
                     requests.post("http://" + con['ip'] + ":" + con['port'] + "/api/broadcast", json=data)
             return "ROUTE /api/connect POST: CONNECT SUCCESS"
     return json.dumps(fetcher.get_connections())
@@ -128,7 +128,6 @@ def initialize(argv):
     if (my_host not in master):
         uri_str = "http://admin:admin@{}:5986/_nodes/couchdb@{}".format(master_host, my_host)
         requests.put(uri_str, data={})
-        time.sleep(5)
         requests.post(master + "/api/connect", json={'ip': my_host, 'port': my_port})
 
     # if myself is master
@@ -146,5 +145,5 @@ def initialize(argv):
 
 # main
 if __name__ == '__main__':
-    threading.Thread(target=initialize, args=(sys.argv[1:])).start()
+    initialize(sys.argv[1:])
     app.run(threaded=True, debug=False, host=my_host, port=int(my_port))
