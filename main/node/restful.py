@@ -20,7 +20,7 @@ my_port = ''
 # instances of functional module
 scheduler = Scheduler()
 worker = Worker()
-fetcher = Fetcher(scheduler, master_host, master_port, my_host, my_port)
+fetcher = Fetcher(scheduler)
 
 # ============================= restful routing ============================= #
 
