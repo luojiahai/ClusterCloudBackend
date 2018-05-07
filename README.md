@@ -11,7 +11,7 @@ pip install flask
 Run API
 
 ```
-python restful.py -a {MASTER_HOST_NAME} -b {MASTER_PORT_NUMBER} -c {MY_HOST_NAME} -d {MY_PORT_NUMBER}
+python restful.py -a {MY_HOST_NAME} -b {MY_PORT_NUMBER} -c {MASTER_HOST_NAME} -d {MASTER_PORT_NUMBER}
 ```
 
 db docs
