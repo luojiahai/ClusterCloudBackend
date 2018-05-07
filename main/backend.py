@@ -8,7 +8,7 @@ from flask_cors import CORS
 app = Flask(__name__)
 CORS(app)
 
-couch = couchdb.Server('http://localhost:5432/')
+couch = couchdb.Server('http://115.146.95.53:5432/')
 db = couch['sentiment-analysis-tweets_']
 
 @app.route("/")
@@ -65,6 +65,27 @@ def get4():
             }
         response["features"].append(feature)
     return Response(json.dumps(response), mimetype="application/json")
+
+@app.route("/getHashTags")
+def getHashTags():
+    rows = db.view("test-doc/_view/new-view-02?group=true")
+    top10 = []
+    for row in rows:
+        if len(top10) < 10:
+            top10.append((row.value,row.key))
+            top10.sort()
+        else:
+            if row.value > top10[0][0]:
+                top10[0] = (row.value,row.key)
+                top10.sort()
+    response = {"top10": [tag[0] for tag in top10]}
+    return Response(json.dumps(response), mimetype="application/json")
+
+
+# @app.route("/hashTag/<tagName>")
+# def function():
+#     pass
+
 
 if __name__ == '__main__':
     argv = sys.argv[1:]
