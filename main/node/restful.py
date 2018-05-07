@@ -76,6 +76,15 @@ def broadcast():
                 scheduler.add_worker(con)
             if (not fetcher.has_connection(con['ip'])):
                 fetcher.add_connection(con)
+        for i in fetcher.get_connections():
+            flag = False
+            for j in connections:
+                if (i['ip'] == j['ip']):
+                    flag = True
+                    break
+            if not flag:
+                fetcher.delete_connection(i['ip'])
+                scheduler.delete_worker(i['ip'])
         return "ROUTE /api/broadcast POST: BROADCAST DONE"
     return '''
         ROUTE /api/broadcast GET: 

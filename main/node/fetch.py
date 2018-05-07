@@ -49,6 +49,12 @@ class Fetcher:
                 return True
         return False
 
+    # delete a connection
+    def delete_connection(self, ip):
+        for connection in self.connections:
+            if (connection['ip'] == ip):
+                self.connections.remove(connection)
+
     # change the master connection
     def change_master(self):
         # delete the disconnected master
@@ -67,6 +73,7 @@ class Fetcher:
         self.master_host = con['ip']
         self.master_port = con['port']
 
+    # set all connection information
     def set_config(self, master_host, master_port, my_host, my_port):
         self.master_host = master_host
         self.master_port = master_port
