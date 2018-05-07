@@ -42,10 +42,13 @@ class Scheduler:
         print("TASKS: ")
         for task in tasks:
             print(task)
-        self.workers[worker['ip']]['working'] = True
-        data = {'tasks': tasks}
-        requests.post('http://' + worker['ip'] + ':' + worker['port'] + '/api/work', json=data)
-        self.workers[worker['ip']]['working'] = False
+        try:
+            self.workers[worker['ip']]['working'] = True
+            data = {'tasks': tasks}
+            requests.post('http://' + worker['ip'] + ':' + worker['port'] + '/api/work', json=data)
+            self.workers[worker['ip']]['working'] = False
+        except Exception as e:
+            print(e)
         print("---------DEBUG---------/REQUEST_WORK")
 
     # scheduling
@@ -66,6 +69,8 @@ class Scheduler:
                 continue
             else:
                 tasks = list(self.pool[worker_k])   # copy instead of reference
+                if (len(tasks) == 0):
+                    continue
                 self.pool[worker_k] = []            # clear after copy
                 # start a thread
                 t = threading.Thread(target=self.request_work, args=(worker_v, tasks))

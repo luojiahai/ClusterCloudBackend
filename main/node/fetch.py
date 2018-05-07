@@ -26,10 +26,13 @@ class Fetcher:
     tweets = []
 
     # constructor
-    def __init__(self, default_master, scheduler):
-        self.master = default_master
+    def __init__(self, scheduler):
         self.connections = []   # list of {"ip": HOST_NAME, "port": PORT_NUMBER}
         self.scheduler = scheduler
+        self.master_host = ''
+        self.master_port = ''
+        self.my_host = ''
+        self.my_port = ''
 
     # add connection con to connetions list
     def add_connection(self, con):
@@ -46,11 +49,17 @@ class Fetcher:
                 return True
         return False
 
+    # delete a connection
+    def delete_connection(self, ip):
+        for connection in self.connections:
+            if (connection['ip'] == ip):
+                self.connections.remove(connection)
+
     # change the master connection
     def change_master(self):
         # delete the disconnected master
         for connection in self.connections:
-            if (connection['ip'] in self.master):
+            if (connection['ip'] in self.master_host):
                 self.connections.remove(connection)
                 # delete its worker as well
                 self.scheduler.delete_worker(connection['ip'])
@@ -61,7 +70,15 @@ class Fetcher:
         
         # choose ans set a new master - the first con in the list
         con = self.connections[0]
-        self.master = 'http://' + con['ip'] + ':' + con['port']
+        self.master_host = con['ip']
+        self.master_port = con['port']
+
+    # set all connection information
+    def set_config(self, master_host, master_port, my_host, my_port):
+        self.master_host = master_host
+        self.master_port = master_port
+        self.my_host = my_host
+        self.my_port = my_port
 
     # twitter stream listener class
     class MyListener(StreamListener):
@@ -94,17 +111,24 @@ class Fetcher:
         while True:
             time.sleep(30)  # 30 seconds
 
-            # broadcast to all other connections
-            cons = {'connections': self.connections}
-            for con in self.connections:
-                # if con is not myself
-                if (con['ip'] not in self.master):
-                    requests.post("http://" + con['ip'] + ":" + con['port'] + "/api/broadcast", json=cons)
+            if (self.my_host in self.master_host):
+                # broadcast to all other connections
+                cons = {'connections': self.connections}
+                for con in self.connections:
+                    # if con is not myself
+                    if (con['ip'] not in self.my_host):
+                        try:
+                            requests.post("http://" + con['ip'] + ":" + con['port'] + "/api/broadcast", json=cons)
+                        except Exception as e:
+                            # the connection is disconnected
+                            print(e)
+                            self.connections.remove(con)
+                            self.scheduler.delete_worker(con['ip'])
 
             data = {'tasks': self.tweets}
             try:
                 # request to schedule
-                r = requests.post(self.master + "/api/schedule", json=data)
+                r = requests.post("http://" + self.master_host + ":" + self.master_port + "/api/schedule", json=data)
                 self.tweets.clear()
             except Exception as e:
                 print("REQUEST_SCHEDULE EXCEPTION CATCHED: " + str(e))

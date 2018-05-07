@@ -10,7 +10,8 @@ import requests
 app = Flask(__name__)
 
 # default master
-master = 'http://'
+master_host = ''
+master_port = ''
 
 # my hostname and portnumber
 my_host = ''
@@ -19,7 +20,7 @@ my_port = ''
 # instances of functional module
 scheduler = Scheduler()
 worker = Worker()
-fetcher = Fetcher(master, scheduler)
+fetcher = Fetcher(scheduler)
 
 # ============================= restful routing ============================= #
 
@@ -75,6 +76,15 @@ def broadcast():
                 scheduler.add_worker(con)
             if (not fetcher.has_connection(con['ip'])):
                 fetcher.add_connection(con)
+        for i in fetcher.get_connections():
+            flag = False
+            for j in connections:
+                if (i['ip'] == j['ip']):
+                    flag = True
+                    break
+            if not flag:
+                fetcher.delete_connection(i['ip'])
+                scheduler.delete_worker(i['ip'])
         return "ROUTE /api/broadcast POST: BROADCAST DONE"
     return '''
         ROUTE /api/broadcast GET: 
@@ -87,45 +97,44 @@ def broadcast():
 
 # initialize a conneciton
 def initialize(argv):
-    master_host = ''
-    master_port = ''
     # command line arguments
     try:
         opts, args = getopt.getopt(argv, "a:b:c:d:", ["masterhost=","masterport","host=","port="])
     except getopt.GetoptError:
-        print('usage: restful.py -a {MASTER_HOST_NAME} -b {MASTER_PORT_NUMBER} -c {MY_HOST_NAME} -d {MY_PORT_NUMBER}')
+        print('usage: restful.py -a {MY_HOST_NAME} -b {MY_PORT_NUMBER} -c {MASTER_HOST_NAME} -d {MASTER_PORT_NUMBER}')
         sys.exit(2)
     if (len(opts) != 4):
-        print('usage: restful.py -a {MASTER_HOST_NAME} -b {MASTER_PORT_NUMBER} -c {MY_HOST_NAME} -d {MY_PORT_NUMBER}')
+        print('usage: restful.py -a {MY_HOST_NAME} -b {MY_PORT_NUMBER} -c {MASTER_HOST_NAME} -d {MASTER_PORT_NUMBER}')
         sys.exit(2)
     for opt, arg in opts:
-        global master
+        global master_host
+        global master_port
         global my_host
         global my_port
         if opt in ("-a", "--host"):
-            my_host = str(arg)
+            my_host += str(arg)
         elif opt in ("-b", "--port"):
-            my_port = str(arg)
+            my_port += str(arg)
         elif opt in ("-c", "--masterhost"):
-            master_host = str(arg)
-            master += str(arg)
+            master_host += str(arg)
         elif opt in ("-d", "--masterport"):
-            master_port = str(arg)
-            master += ':' + str(arg)
+            master_port += str(arg)
     
+    fetcher.set_config(master_host, master_port, my_host, my_port)
+
     # add myself to workers and connections
     worker = {'ip': my_host, 'port': my_port}
     scheduler.add_worker(worker)
     fetcher.add_connection(worker)
 
     # connect to master if me not master
-    if (my_host not in master):
+    if (my_host not in master_host):
         uri_str = "http://admin:admin@{}:5986/_nodes/couchdb@{}".format(master_host, my_host)
         requests.put(uri_str, data={})
-        requests.post(master + "/api/connect", json={'ip': my_host, 'port': my_port})
+        requests.post("http://" + master_host + ":" + master_port + "/api/connect", json={'ip': my_host, 'port': my_port})
 
     # if myself is master
-    if (my_host in master):
+    if (my_host in master_host):
         # start listenr thread for harvesting tweets
         t1 = threading.Thread(target=fetcher.listen)
         t1.start()
