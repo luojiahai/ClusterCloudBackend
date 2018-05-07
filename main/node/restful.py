@@ -111,6 +111,8 @@ def initialize(argv):
         elif opt in ("-d", "--masterport"):
             master_port += str(arg)
     
+    fetcher.set_config(master_host, master_port, my_host, my_port)
+
     # add myself to workers and connections
     worker = {'ip': my_host, 'port': my_port}
     scheduler.add_worker(worker)

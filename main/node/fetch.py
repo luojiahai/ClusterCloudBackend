@@ -26,13 +26,13 @@ class Fetcher:
     tweets = []
 
     # constructor
-    def __init__(self, scheduler, master_host, master_port, my_host, my_port):
-        self.master_host = master_host
-        self.master_port = master_port
+    def __init__(self, scheduler):
         self.connections = []   # list of {"ip": HOST_NAME, "port": PORT_NUMBER}
         self.scheduler = scheduler
-        self.my_host = my_host
-        self.my_port = my_port
+        self.master_host = ''
+        self.master_port = ''
+        self.my_host = ''
+        self.my_port = ''
 
     # add connection con to connetions list
     def add_connection(self, con):
@@ -67,6 +67,12 @@ class Fetcher:
         self.master_host = con['ip']
         self.master_port = con['port']
 
+    def set_config(self, master_host, master_port, my_host, my_port):
+        self.master_host = master_host
+        self.master_port = master_port
+        self.my_host = my_host
+        self.my_port = my_port
+
     # twitter stream listener class
     class MyListener(StreamListener):
         def on_data(self, data):
@@ -99,8 +105,6 @@ class Fetcher:
             time.sleep(30)  # 30 seconds
 
             if (self.my_host in self.master_host):
-                print(self.my_host)
-                print(self.master_host)
                 # broadcast to all other connections
                 cons = {'connections': self.connections}
                 for con in self.connections:
