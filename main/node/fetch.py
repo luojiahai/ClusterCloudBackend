@@ -94,6 +94,13 @@ class Fetcher:
         while True:
             time.sleep(30)  # 30 seconds
 
+            # broadcast to all other connections
+            cons = {'connections': self.connections}
+            for con in self.connections:
+                # if con is not myself
+                if (con['ip'] not in self.master):
+                    requests.post("http://" + con['ip'] + ":" + con['port'] + "/api/broadcast", json=cons)
+
             data = {'tasks': self.tweets}
             try:
                 # request to schedule

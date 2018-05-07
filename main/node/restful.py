@@ -37,12 +37,6 @@ def connect():
             # add to connections and workers list
             fetcher.add_connection(data)
             scheduler.add_worker(data)
-            # broadcast to all other connections
-            data = {'connections': fetcher.get_connections()}
-            for con in fetcher.get_connections():
-                # if con is not myself
-                if (my_host not in con['ip']):
-                    requests.post("http://" + con['ip'] + ":" + con['port'] + "/api/broadcast", json=data)
             return "ROUTE /api/connect POST: CONNECT SUCCESS"
     return json.dumps(fetcher.get_connections())
 
