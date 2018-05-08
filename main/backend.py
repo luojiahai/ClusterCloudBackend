@@ -89,7 +89,7 @@ def hashTag(tagName):
     response = {"type": "FeatureCollection",
             "features": [{
                 "type": "Feature",
-                "geometry": row.value,
+                "geometry": row.value[0],
                 "properties": {
                     "id": row.id,
                     "polarity": row.value[1],
