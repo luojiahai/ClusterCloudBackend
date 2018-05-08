@@ -92,7 +92,7 @@ def hashTag(tagName):
                 "geometry": row.value,
                 "properties": {
                     "id": row.id,
-                    "polarity": row.value[1]
+                    "polarity": row.value[1],
                     "coordinates": row.value[0]["coordinates"]
                 }
             }for row in rows]}
