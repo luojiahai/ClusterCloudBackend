@@ -78,7 +78,7 @@ def getHashTags():
             if row.value > top10[0][0]:
                 top10[0] = (row.value,row.key)
                 top10.sort()
-    response = {"top10": [tag[1] for tag in top10]}
+    response = [{'hashtag': tag[1]} for tag in top10]
     return Response(json.dumps(response), mimetype="application/json")
 
 
