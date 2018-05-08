@@ -92,7 +92,8 @@ def hashTag(tagName):
                 "geometry": row.value,
                 "properties": {
                     "id": row.id,
-                    "coordinates": row.value["coordinates"]
+                    "polarity": row.value[1]
+                    "coordinates": row.value[0]["coordinates"]
                 }
             }for row in rows]}
     return Response(json.dumps(response), mimetype="application/json")
