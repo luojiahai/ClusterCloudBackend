@@ -8,7 +8,7 @@ from flask_cors import CORS
 app = Flask(__name__)
 CORS(app)
 
-couch = couchdb.Server('http://115.146.95.53:5432/')
+couch = couchdb.Server('http://localhost:5432/')
 db = couch['sentiment-analysis-tweets_']
 
 @app.route("/")
