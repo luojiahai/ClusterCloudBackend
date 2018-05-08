@@ -68,7 +68,7 @@ def get4():
 
 @app.route("/getHashTags")
 def getHashTags():
-    rows = db.view("test-doc/_view/new-view-02?group=true")
+    rows = db.view("test-doc/new-view-02", group='true')
     top10 = []
     for row in rows:
         if len(top10) < 10:
