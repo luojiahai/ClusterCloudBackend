@@ -17,7 +17,7 @@ def hello():
 
 @app.route("/get1")
 def get1():
-    rows = db.view("test-doc/new-view-01", descending='true', limit=3000)
+    rows = db.view("test-doc/new-view-01", descending='true', limit=2048)
     response = {
             "type": "FeatureCollection",
             "features": []
