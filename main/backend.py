@@ -131,21 +131,18 @@ def language(lanName):
 
 if __name__ == '__main__':
     argv = sys.argv[1:]
-    host = ''
     port = ''
     # command line arguments
     try:
-        opts, args = getopt.getopt(argv, "h:p:", ["host=", "port="])
+        opts, args = getopt.getopt(argv, "p:", ["port="])
     except getopt.GetoptError:
-        print('usage: backend.py -h {HOST_NAME} -p {PORT_NUMBER}')
+        print('usage: backend.py -p {PORT_NUMBER}')
         sys.exit(2)
-    if (len(opts) != 2):
-        print('usage: backend.py -h {HOST_NAME} -p {PORT_NUMBER}')
+    if (len(opts) != 1):
+        print('usage: backend.py -p {PORT_NUMBER}')
         sys.exit(2)
     for opt, arg in opts:
-        if opt in ("-h", "--host"):
-            host = str(arg)
-        elif opt in ("-p", "--port"):
+        if opt in ("-p", "--port"):
             port = str(arg)
 
-    app.run(threaded=True, debug=False, host=host, port=int(port))
+    app.run(threaded=True, debug=False, host="0.0.0.0", port=int(port))
