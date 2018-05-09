@@ -79,7 +79,7 @@ def getHashTags():
                 top10[0] = (row.value,row.key)
                 top10.sort()
     top10.sort(reverse=True)
-    response = [{'hashtag': tag[1]} for tag in top10]
+    response = [{'hashtag': tag[1], 'count': tag[0]} for tag in top10]
     return Response(json.dumps(response), mimetype="application/json")
 
 
@@ -112,7 +112,7 @@ def getLan():
                 top10[0] = (row.value,row.key)
                 top10.sort()
     top10.sort(reverse=True)
-    response = [{'language': tag[1]} for tag in top10]
+    response = [{'language': tag[1], 'count': tag[0]} for tag in top10]
     return Response(json.dumps(response), mimetype="application/json")
 
 @app.route("/language/<lanName>")
