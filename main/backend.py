@@ -17,7 +17,7 @@ def hello():
 
 @app.route("/get1")
 def get1():
-    rows = db.view("test-doc/new-view-01")
+    rows = db.view("test-doc/new-view-01", descending='true', limit=3000)
     response = {
             "type": "FeatureCollection",
             "features": []
@@ -25,11 +25,11 @@ def get1():
     for row in rows:
         feature = {
                 "type": "Feature",
-                "geometry": row.key,
+                "geometry": row.value[0],
                 "properties": {
                     "id": row.id,
-                    "polarity": row.value,
-                    "coordinates": row.key["coordinates"]
+                    "polarity": row.value[1],
+                    "coordinates": row.value[0]["coordinates"]
                 }
             }
         response["features"].append(feature)
