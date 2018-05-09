@@ -1,3 +1,4 @@
+# This file was created by Geoffrey Ka-Hoi Law and modified by Zhe Tang.
 import sys
 import getopt
 from flask import Flask, Response
@@ -15,6 +16,8 @@ db = couch['sentiment-analysis-tweets_']
 def hello():
     return "Hello World!"
 
+# Filter limit numbers of sentiment data from couchDB
+# and rearrange them into GeoJson style.
 @app.route("/get1")
 def get1():
     rows = db.view("test-doc/new-view-01", descending='true', limit=2048)
@@ -35,18 +38,8 @@ def get1():
         response["features"].append(feature)
     return Response(json.dumps(response), mimetype="application/json")
 
-@app.route("/get2")
-def get2():
-    rows = db.view("test-doc/new-view-02")
-    response = []
-    for row in rows:
-        obj = {
-                "hashtag": row.key,
-                "count": row.value
-            }
-        response.append(obj)
-    return Response(json.dumps(response), mimetype="application/json")
-
+# Filter missspelling data from couchDB
+# and rearrange them into GeoJson style.
 @app.route("/get4")
 def get4():
     rows = db.view("test-doc/new-view-04")
@@ -66,6 +59,7 @@ def get4():
         response["features"].append(feature)
     return Response(json.dumps(response), mimetype="application/json")
 
+# Reduce view and get top 10 popular hashtags.
 @app.route("/getHashTags")
 def getHashTags():
     rows = db.view("test-doc/new-view-02", group='true')
@@ -82,7 +76,8 @@ def getHashTags():
     response = [{'hashtag': tag[1], 'count': tag[0]} for tag in top10]
     return Response(json.dumps(response), mimetype="application/json")
 
-
+# Filter particular Hashtag data from couchDB
+# and rearrange them into GeoJson style.
 @app.route("/hashTag/<tagName>")
 def hashTag(tagName):
     rows = db.view("test-doc/new-view-02", key=tagName, reduce='false')
@@ -98,7 +93,7 @@ def hashTag(tagName):
             }for row in rows]}
     return Response(json.dumps(response), mimetype="application/json")
 
-
+# Reduce view and get top 10 popular language.
 @app.route("/getLan")
 def getLan():
     rows = db.view("test-doc/new-view-03", group='true')
@@ -115,6 +110,8 @@ def getLan():
     response = [{'language': tag[1], 'count': tag[0]} for tag in top10]
     return Response(json.dumps(response), mimetype="application/json")
 
+# Filter particular language data from couchDB
+# and rearrange them into GeoJson style.
 @app.route("/language/<lanName>")
 def language(lanName):
     rows = db.view("test-doc/new-view-03", key=lanName, reduce='false')
