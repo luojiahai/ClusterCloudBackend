@@ -22,6 +22,7 @@ http://couchdb-python.readthedocs.io
 Install sentiment analysis dependencies
 ```
 pip install textBlob
+python -m textblob.download_corpora
 pip install numpy
 pip install scikit-learn
 pip install nltk
@@ -47,7 +48,7 @@ def marshall_work(comm):
     processes = comm.Get_size()
     #TODO: change it to your desired result type
     results = []
-    
+
     for i in range(processes-1):
     # Receive data
         results.append(comm.recv(source=(i+1), tag=MASTER_RANK))
@@ -57,6 +58,6 @@ def marshall_work(comm):
     return results
   ```
   Modify it to suit your needs.
-  
+
   Finally, change the ```input_file``` argument to a database query,
   which I have no idea of how to do.
